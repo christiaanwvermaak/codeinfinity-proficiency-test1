@@ -1,0 +1,37 @@
+services:
+  app:
+    build: . 
+    container_name: php_apache_app
+    restart: unless-stopped
+    ports:
+      - "8080:80" # Map host port 8080 to container port 80 (Apache's default)
+    volumes:
+      - ./app:/var/www/html:delegated # Mount current directory to /var/www/html
+    depends_on:
+      - db # Ensure MongoDB is started first
+    environment:
+      # Expose environment variables to the PHP application
+      MONGO_HOST: db
+      MONGO_PORT: 27017
+      MONGO_USER: wimpie
+      MONGO_PASSWORD: MongoDB123
+      MONGO_DATABASE: codeinfinity_db
+
+  # Service for the database (MongoDB)
+  db:
+    image: mongo:latest
+    container_name: mongodb_server
+    restart: unless-stopped
+    ports:
+      - "27017:27017" # Expose the MongoDB port (optional)
+    volumes:
+      - mongodb_data:/data/db # Persist MongoDB data
+    environment:
+      # Configuration for the MongoDB root user
+      MONGO_INITDB_ROOT_USERNAME: wimpie
+      MONGO_INITDB_ROOT_PASSWORD: MongoDB123
+      MONGO_INITDB_DATABASE: codeinfinity_db
+
+# Define volumes for data persistence
+volumes:
+  mongodb_data:
