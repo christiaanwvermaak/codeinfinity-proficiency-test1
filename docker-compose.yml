@@ -17,17 +17,15 @@ services:
       MONGO_PASSWORD: MongoDB123
       MONGO_DATABASE: codeinfinity_db
 
-  # Service for the database (MongoDB)
   db:
     image: mongo:latest
     container_name: mongodb_server
     restart: unless-stopped
     ports:
-      - "27017:27017" # Expose the MongoDB port (optional)
+      - "27017:27017" 
     volumes:
-      - mongodb_data:/data/db # Persist MongoDB data
+      - mongodb_data:/data/db 
     environment:
-      # Configuration for the MongoDB root user
       MONGO_INITDB_ROOT_USERNAME: wimpie
       MONGO_INITDB_ROOT_PASSWORD: MongoDB123
       MONGO_INITDB_DATABASE: codeinfinity_db
