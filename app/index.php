@@ -1,6 +1,9 @@
 <?php
-    use MongoDB\Driver\BulkWrite;
-    use MongoDB\Driver\Manager;
+
+use App\Crud\Mongo;
+
+    require_once './crud/mongo.php';
+    $mongo = new Mongo('mongodb://wimpie:MongoDB123@localhost:27017', 'codeinfinity_db', 'people');
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET' || (empty($_POST['name']) && empty($_POST['surname']) && empty($_POST['idnumber']) && empty($_POST['dob']))) {
         echo <<<HTML
@@ -59,6 +62,9 @@
         if (!preg_match('/^[0-9]{13}$/', $idnumber)) {
             $error['idnumber'] = 'ID Number must be exactly 13 digits.';
         }
+        if ($mongo->findOneByIdnumber($idnumber)) {
+            $error['idnumber'] = 'ID Number already exists.';
+        }
 
         $dob = htmlspecialchars($_POST['dob'] ?? '');
         if (empty($dob)) {
@@ -73,6 +79,13 @@
             echo "</ul><a href='index.php'>Go back</a>";
             exit;
         } else {
+            $person = [
+                'name' => $name,
+                'surname' => $surname,
+                'idnumber' => $idnumber,
+                'dob' => $dob
+            ];
+            $mongo->insertOne($person);
             echo <<<HTML
             <html lang="en">
             <head>

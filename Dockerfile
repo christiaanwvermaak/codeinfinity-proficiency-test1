@@ -3,6 +3,9 @@ FROM php:8.4-apache
 RUN apt-get update && apt-get install -y \
     git \
     libssl-dev \
+    pkg-config \
+    unzip \
+    zip \
     zlib1g-dev \
     libpng-dev \
     libzip-dev \
