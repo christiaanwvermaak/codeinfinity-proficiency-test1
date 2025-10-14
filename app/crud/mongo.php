@@ -22,31 +22,38 @@
             $this->namespace = "{$db}.{$collection}";
         }
         
-        public function insertOne(array $data): ?string {
+        public function insertOne(array $data): mixed {
             try {
-                $data['_id'] = new ObjectId();
-                $data['createdAt'] = new UTCDateTime();
-                $bulk = new \MongoDB\Driver\BulkWrite();
-                $bulk->insert($data);
-                $result = $this->manager->executeBulkWrite($this->namespace, $bulk);
-                return (string)$data['_id'];
+                $cmd = new Command([
+                    'insert' => $this->collection,
+                    'documents' => [
+                        array_merge($data, [
+                            '_id' => new ObjectId(),
+                            'createdAt' => new UTCDateTime()
+                        ])
+                    ]
+                ]);
+                $result = $this->manager->executeCommand($this->db, $cmd)->toArray()[0] ?? null;
+                return $result ? (string)$data['_id'] : null;
             } catch (MongoDBException $e) {
                 error_log("Insert Error: " . $e->getMessage());
                 return null;
             }
         }
 
-        public function insertMany(array $documents): array {
+        public function insertMany(array $documents): mixed {
             $insertedIds = [];
             try {
-                $bulk = new \MongoDB\Driver\BulkWrite();
-                foreach ($documents as $data) {
-                    $data['_id'] = new ObjectId();
-                    $data['createdAt'] = new UTCDateTime();
-                    $insertedIds[] = (string)$data['_id'];
-                    $bulk->insert($data);
-                }
-                $this->manager->executeBulkWrite($this->namespace, $bulk);
+                $cmd = new Command([
+                    'insert' => $this->collection,
+                    'documents' => array_map(function($doc) use (&$insertedIds) {
+                        $doc['_id'] = new ObjectId();
+                        $doc['createdAt'] = new UTCDateTime();
+                        $insertedIds[] = (string)$doc['_id'];
+                        return $doc;
+                    }, $documents)
+                ]);
+                return $this->manager->executeCommand($this->db, $cmd)->toArray()[0] ?? null;
             } catch (MongoDBException $e) {
                 error_log("Insert Many Error: " . $e->getMessage());
             }
