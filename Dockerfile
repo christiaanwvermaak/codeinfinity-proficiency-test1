@@ -22,6 +22,17 @@ RUN a2enmod rewrite
 
 WORKDIR /var/www/html
 
+# Copy project php.ini into PHP conf.d so it's loaded
+COPY docker/php.ini /usr/local/etc/php/conf.d/99-app.ini
+
+# Install Composer (official installer) and make it globally available
+ENV COMPOSER_HOME=/composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    chmod +x /usr/local/bin/composer
+
+RUN composer require mongodb/mongodb vlucas/phpdotenv
+
+# Copy application code
 COPY app /var/www/html
 
 # The base image handles the Apache startup command
