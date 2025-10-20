@@ -63,17 +63,52 @@ class Mongo {
         }
     }
 
-    public function findOneByIdnumber(string $idnumber): ?stdClass {
+    public function findOneByIdnumber(string $idnumber): mixed {
+        $idnumber = trim($idnumber);
         try {
+            // 1) Exact string match
             $result = $this->collection->findOne(['idnumber' => $idnumber]);
-            return $result ?: null;
+            if ($result) {
+                return $result;
+            }
+
+            // 2) If numeric, try numeric matches (int and Int64)
+            if (ctype_digit($idnumber)) {
+                $intVal = (int)$idnumber;
+                $result = $this->collection->findOne(['idnumber' => $intVal]);
+                if ($result) {
+                    return $result;
+                }
+                try {
+                    $int64 = new \MongoDB\BSON\Int64($idnumber);
+                    $result = $this->collection->findOne(['idnumber' => $int64]);
+                    if ($result) {
+                        return $result;
+                    }
+                } catch (\Throwable $e) {
+                    // ignore Int64 creation errors
+                }
+            }
+
+            // 3) Fallback: trimmed regex match to handle whitespace or different types
+            try {
+                $regex = new \MongoDB\BSON\Regex('^' . preg_quote($idnumber, '/') . '$', '');
+                $result = $this->collection->findOne(['idnumber' => $regex]);
+                if ($result) {
+                    return $result;
+                }
+            } catch (\Throwable $e) {
+                // ignore regex errors
+            }
+
+            return null;
         } catch (\Throwable $e) {
             error_log("Find One Error: " . $e->getMessage());
             return null;
         }
     }
 
-    public function findOneById(string $id): ?stdClass {
+    public function findOneById(string $id): mixed {
         try {
             $oid = new ObjectId($id);
             $result = $this->collection->findOne(['_id' => $oid]);
