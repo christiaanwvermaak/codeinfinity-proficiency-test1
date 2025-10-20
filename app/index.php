@@ -2,8 +2,21 @@
 
 use App\Crud\Mongo;
 
-    require_once './crud/mongo.php';
-    $mongo = new Mongo('mongodb://wimpie:MongoDB123@localhost:27017', 'codeinfinity_db', 'people');
+require_once './crud/mongo.php';
+
+// Build MongoDB URI from environment variables (docker-compose provides these)
+$mongoHost = getenv('MONGO_HOST') ?: 'localhost';
+$mongoPort = getenv('MONGO_PORT') ?: '27017';
+$mongoUser = getenv('MONGO_USER') ?: 'wimpie';
+$mongoPass = getenv('MONGO_PASSWORD') ?: 'MongoDB123';
+$mongoDb = getenv('MONGO_DATABASE') ?: 'codeinfinity_db';
+$authDb = getenv('MONGO_AUTHDB') ?: 'admin';
+
+$uri = sprintf('mongodb://%s:%s@%s:%s/%s?retryWrites=true&w=majority',
+    rawurlencode($mongoUser), rawurlencode($mongoPass), $mongoHost, $mongoPort, $authDb
+);
+
+$mongo = new Mongo($uri, $mongoDb, 'people');
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET' || (empty($_POST['name']) && empty($_POST['surname']) && empty($_POST['idnumber']) && empty($_POST['dob']))) {
         echo <<<HTML
