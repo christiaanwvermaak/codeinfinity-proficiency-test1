@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $dd = substr($dobNormalized, 8, 2);
         $expectedPrefix = $yy . $mm . $dd;
         if (substr($idnumber, 0, 6) !== $expectedPrefix) {
-            $error['idnumber'] = 'ID Number prefix (first 6 digits) must match DOB in YYMMDD format.';
+            $error['idnumber'] = 'First six (6) digits of ID Number must match DOB in YYMMDD format.';
         }
     }
 
@@ -123,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Personal Information</title>
+                <h2>Personal Information</h2>
                 <link rel="stylesheet" href="styles.css">
             </head>
             <body>
