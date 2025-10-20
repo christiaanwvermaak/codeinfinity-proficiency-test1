@@ -123,12 +123,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <h2>Personal Information</h2>
+                <title>Personal Information Added</title>
                 <link rel="stylesheet" href="styles.css">
             </head>
             <body>
                 <div class="input-container">
-                    <h1>Person Added</h1>
+                    <h2>Person Added</h2>
                     <div class="form-group"><label>Name</label><div>{$outName}</div></div>
                     <div class="form-group"><label>Surname</label><div>{$outSurname}</div></div>
                     <div class="form-group"><label>ID Number</label><div>{$outId}</div></div>
