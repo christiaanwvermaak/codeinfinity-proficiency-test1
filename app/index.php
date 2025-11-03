@@ -190,11 +190,26 @@ echo <<<HTML
         </div>
         <div style="display: flex; gap: 0.5rem;">
             <button type="submit">POST</button>
-            <button type="reset">CANCEL</button>
+            <button type="button" id="clearBtn">CLEAR</button>
         </div>
     </form>
-    <div class="error">{$errGeneral}</div>
-    </div>
+        <div class="error">{$errGeneral}</div>
+        </div>
+        <script>
+        // Clear form fields and inline errors when the CLEAR button is clicked
+        (function(){
+            var btn = document.getElementById('clearBtn');
+            if (!btn) return;
+            btn.addEventListener('click', function(){
+                ['name','surname','idnumber','dob'].forEach(function(id){
+                    var el = document.getElementById(id);
+                    if (el) el.value = '';
+                });
+                document.querySelectorAll('.error').forEach(function(node){ node.textContent = ''; });
+                var first = document.getElementById('name'); if (first) first.focus();
+            });
+        })();
+        </script>
 </body>
 </html>
 HTML;
