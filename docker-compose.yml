@@ -4,7 +4,7 @@ services:
     container_name: php_apache_app
     restart: unless-stopped
     ports:
-      - "8080:80" # Map host port 8080 to container port 80 (Apache's default)
+      - "8081:80" # Map host port 8080 to container port 80 (Apache's default)
     volumes:
       - ./app:/var/www/html:delegated # Mount current directory to /var/www/html
     depends_on:
@@ -22,7 +22,7 @@ services:
     container_name: mongodb_server
     restart: unless-stopped
     ports:
-      - "27017:27017" 
+      - "27018:27017" 
     volumes:
       - mongodb_data:/data/db 
     environment:
